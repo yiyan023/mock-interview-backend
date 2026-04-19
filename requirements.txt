@@ -3,3 +3,4 @@ Flask_Cors==4.0.0
 python-dotenv==1.2.2
 resend==2.27.0
 stripe==15.0.1
+gunicorn==25.3.0
