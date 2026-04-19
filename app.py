@@ -29,5 +29,9 @@ CORS(
 register_stripe_routes(app)
 register_email_routes(app)
 
+@app.route('/health', methods=['GET'])
+def health_check():
+    return {'status': 'ok'}, 200
+
 if __name__ == "__main__":
     app.run(port=3000, debug=True)
