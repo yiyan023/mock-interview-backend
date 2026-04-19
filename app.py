@@ -5,8 +5,9 @@ from dotenv import load_dotenv
 from flask import Flask
 from flask_cors import CORS
 
-from email_routes import register_email_routes
-from stripe_routes import register_stripe_routes
+from routes.email_routes import register_email_routes
+from routes.stripe_routes import register_stripe_routes
+from routes.calendar_routes import register_calendar_routes
 
 load_dotenv()
 
@@ -28,6 +29,7 @@ CORS(
 
 register_stripe_routes(app)
 register_email_routes(app)
+register_calendar_routes(app)
 
 @app.route('/health', methods=['GET'])
 def health_check():

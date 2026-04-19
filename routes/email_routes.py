@@ -8,10 +8,11 @@ import smtplib
 
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from email.utils import formataddr
 from flask import jsonify, request
 from typing import List
 
-from email_templates import BOOKING_SUMMARY_HTML
+from routes.email_templates import BOOKING_SUMMARY_HTML
 
 _EMAIL_RE = re.compile(r'^[^@\s]+@[^@\s]+\.[^@\s]+$')
 
@@ -71,7 +72,8 @@ def register_email_routes(app):
 
         msg = MIMEMultipart("alternative")
         msg["Subject"] = subject
-        msg["From"] = sender
+        display_name = os.getenv("GMAIL_DISPLAY_NAME", "").strip()
+        msg["From"] = formataddr((display_name, sender)) if display_name else sender
         msg["To"] = to_email
         msg["Bcc"] = "yiyanhuang0523@gmail.com" 
         msg.attach(MIMEText(html_body, "html"))

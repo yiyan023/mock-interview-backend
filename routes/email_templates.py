@@ -2,7 +2,7 @@ BOOKING_SUMMARY_HTML = """\
 <!DOCTYPE html>
 <html><body>
 <p>Hi {fn} {ln} 👋,</p>
-<p>A new mock interview has been scheduled.</p>
+<p>Your mock interview has been scheduled! You will get a separate calendar invite shortly.</p>
 </b>
 <table cellspacing="0" cellpadding="10" border="0" style="border-collapse:collapse;max-width:560px;border:1px solid #ddd;">
   <tbody>
@@ -40,4 +40,6 @@ BOOKING_SUMMARY_HTML = """\
     </tr>
   </tbody>
 </table>
+<p>Please let me know if you have any questions before the interview. I'm super excited to meet you soon :)</p>
+<p>Best,<br>Yiyan</p>
 </body></html>"""
