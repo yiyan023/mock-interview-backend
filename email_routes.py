@@ -4,8 +4,10 @@ import os
 import re
 import urllib.error
 import urllib.request
-import resend
+import smtplib
 
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 from flask import jsonify, request
 from typing import List
 
@@ -17,12 +19,12 @@ _EMAIL_RE = re.compile(r'^[^@\s]+@[^@\s]+\.[^@\s]+$')
 def register_email_routes(app):
     @app.route('/api/email/booking-summary', methods=['POST'])
     def booking_summary_email():
-        api_key = os.getenv('RESEND_API_KEY')
-        from_addr = os.getenv('RESEND_FROM')
+        sender = os.environ["GMAIL_ADDRESS"]
+        password = os.environ["GMAIL_PASSWORD"]
 
-        if not api_key or not from_addr:
+        if not sender or not password:
             return jsonify({
-                'error': 'Email is not configured (set RESEND_API_KEY and RESEND_FROM on the server).',
+                'error': 'Email is not configured (set GMAIL_ADDRESS and GMAIL_PASSWORD on the server).',
             }), 500
 
         data = request.get_json(silent=True)
@@ -51,7 +53,6 @@ def register_email_routes(app):
 
         safe_to = html.escape(to_email)
         safe_when = html.escape(f'{selected_iso} ({timezone})' if timezone else selected_iso)
-        to_list = [to_email, "yiyanhuang0523@gmail.com"]
 
         subject = f"{first_name} {last_name} | Mock Interview Confirmation"
         
@@ -68,27 +69,18 @@ def register_email_routes(app):
             referral_display=referral or '',
         )
 
-        resend.api_key = api_key
-
-        params: List[resend.Emails.SendParams] = [
-            {
-                "from": "Mock Interview Scheduler <onboarding@resend.dev>",
-                "to": "y84huang@uwaterloo.ca",
-                "subject": "hello world",
-                "html": "<h1>it works!</h1>",
-            },
-            {
-                "from": "Mock Interview Scheduler <onboarding@resend.dev>",
-                "to": "y84huang@uwaterloo.ca",
-                "subject": subject,
-                "html": html_body,
-            }
-        ]
+        msg = MIMEMultipart("alternative")
+        msg["Subject"] = subject
+        msg["From"] = sender
+        msg["To"] = to_email
+        msg["Bcc"] = "yiyanhuang0523@gmail.com" 
+        msg.attach(MIMEText(html_body, "html"))
 
         try:
-            r = resend.Batch.send(params)
-            
-            return jsonify({'data': r.data}), 200
+            with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
+                server.login(sender, password)
+                server.sendmail(sender, to_email, msg.as_string())
+                return jsonify({'message': 'Email sent successfully'}), 200
         
         except Exception as e:
             return jsonify({'error': str(e)}), 500
