@@ -24,7 +24,7 @@ CORS(
         },
     },
     allow_headers=["Content-Type"],
-    methods=["POST", "OPTIONS"],
+    methods=["GET", "POST", "OPTIONS"],
 )
 
 register_stripe_routes(app)
